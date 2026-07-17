@@ -4,23 +4,23 @@ setlocal enabledelayedexpansion
 :: Check for administrator permissions
 openfiles >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [!] Dieses Skript muss als Administrator ausgefuehrt werden!
-    echo Bitte klicken Sie mit der rechten Maustaste auf die Datei und waehlen Sie "Als Administrator ausfuehren".
+    echo [!] This script must be run as Administrator!
+    echo Please right-click the file and select "Run as administrator".
     pause
     exit /b
 )
 
-:: Wechselt in das Verzeichnis der Batch-Datei (wichtig bei "Als Admin ausführen")
+:: Changes to the directory of the batch file (important when "Run as Admin")
 cd /d "%~dp0"
 
 set "EXE_PATH=x64\Release\Malwarebytes Unlimited Trial.exe"
 
 if exist "%EXE_PATH%" (
-    echo [+] Das Programm wurde bereits kompiliert. Starte Anwendung...
+    echo [+] The program is already compiled. Starting application...
     goto run_app
 )
 
-echo [*] Suche nach MSBuild.exe in Standardpfaden...
+echo [*] Searching for MSBuild.exe in standard paths...
 set "MSBUILD_PATH="
 
 :: Check standard installation paths for MSBuild
@@ -39,31 +39,31 @@ for %%p in (
 
 :found_msbuild
 if "%MSBUILD_PATH%"=="" (
-    echo [!] MSBuild.exe wurde nicht in den Standardpfaden gefunden.
-    echo Bitte vergewissern Sie sich, dass Visual Studio oder die Build Tools installiert sind.
+    echo [!] MSBuild.exe was not found in the standard paths.
+    echo Please make sure Visual Studio or the Build Tools are installed.
     pause
     exit /b
 )
 
-echo [+] MSBuild gefunden unter: "%MSBUILD_PATH%"
-echo [*] Kompiliere C++ Projekt...
+echo [+] MSBuild found at: "%MSBUILD_PATH%"
+echo [*] Compiling C++ project...
 
 :: Try default compilation first
 "%MSBUILD_PATH%" "Malwarebytes Unlimited Trial.vcxproj" /p:Configuration=Release /p:Platform=x64
 if %errorlevel% equ 0 goto build_success
 
-echo [!] Standard-Kompilierung fehlgeschlagen. Versuche mit PlatformToolset v145...
+echo [!] Default compilation failed. Trying with PlatformToolset v145...
 "%MSBUILD_PATH%" "Malwarebytes Unlimited Trial.vcxproj" /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v145
 if %errorlevel% equ 0 goto build_success
 
-echo [!] Kompilierung fehlgeschlagen. Bitte ueberpruefen Sie die Fehlermeldungen oben.
+echo [!] Compilation failed. Please check the error messages above.
 pause
 exit /b
 
 :build_success
-echo [+] Kompilierung erfolgreich abgeschlossen!
+echo [+] Compilation completed successfully!
 
 :run_app
-echo [*] Starte: "%EXE_PATH%"
+echo [*] Starting: "%EXE_PATH%"
 "%EXE_PATH%"
 pause
